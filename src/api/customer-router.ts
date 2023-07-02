@@ -43,3 +43,21 @@ router.post('/', async (req, res) => {
         }
     }
 });
+
+router.delete('/:customerId', async (req, res) => {
+    const result = await datasource.query('DELETE FROM customer WHERE id=?',
+        [req.params.customerId]);
+    if (result.affectedRows === 1) res.sendStatus(204);
+    else res.sendStatus(404);
+});
+
+router.get('/', async (req, res)=>{
+    let query = "%";
+    if (req.query.q){
+        query = `%${req.query.q}%`;
+    }
+    const resultSet = await datasource
+.query('SELECT * FROM customer WHERE id LIKE ? OR name LIKE ? OR address LIKE ? OR contact LIKE ?',
+    new Array(4).fill(query));
+    res.json(resultSet);
+});
